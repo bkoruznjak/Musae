@@ -8,16 +8,9 @@
         tools:context="bkoruznjak.from.hr.musae.views.MainActivity">
 
         <Button
-            android:id="@+id/btn_scan_folders"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="scan folder structure" />
-
-        <Button
             android:id="@+id/btn_start_player"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/btn_scan_folders"
             android:text="run radio" />
 
         <android.support.v7.widget.RecyclerView

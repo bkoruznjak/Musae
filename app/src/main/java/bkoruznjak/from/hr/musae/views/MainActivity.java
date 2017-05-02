@@ -47,18 +47,6 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
         mainBinding.recyclerViewSongs.setLayoutManager(layoutManager);
         mainBinding.recyclerViewSongs.setAdapter(mSongAdapter);
 
-        mainBinding.btnScanFolders.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (hasRightsToDoMagic()) {
-                    musicScanner.gatherMusicInfo();
-                }
-            }
-
-
-        });
-
         mainBinding.btnStartPlayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -82,6 +70,14 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (hasRightsToDoMagic()) {
+            musicScanner.gatherMusicInfo();
+        }
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         musicScanner.clean();
@@ -96,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     musicScanner.gatherMusicInfo();
                 } else {
-                    Toast.makeText(getApplicationContext(), "Aplikacija nema potrebne ovlasti za dijeljenje raspoloženja", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "App does not have sufficient permissions to check your media", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
