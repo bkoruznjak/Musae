@@ -1,4 +1,4 @@
-package bkoruznjak.from.hr.musae;
+package bkoruznjak.from.hr.musae.views;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -16,10 +16,11 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
+import bkoruznjak.from.hr.musae.R;
 import bkoruznjak.from.hr.musae.databinding.ActivityMainBinding;
 import bkoruznjak.from.hr.musae.library.MusicScanner;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MusicScanner.MediaListener{
 
     private ActivityMainBinding mainBinding;
     private final int READ_EXTERNAL_STORAGE_PERMISSION_ID = 69;
@@ -39,8 +40,6 @@ public class MainActivity extends AppCompatActivity {
                 if (hasRightsToDoMagic()) {
                     musicScanner.gatherMusicInfo();
                 }
-
-
             }
 
 
@@ -65,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        musicScanner.prepare(this);
+        musicScanner.prepare(this,this);
     }
 
     @Override
@@ -103,4 +102,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onMediaFound(String data) {
+        Log.d("bbb",data);
+    }
 }

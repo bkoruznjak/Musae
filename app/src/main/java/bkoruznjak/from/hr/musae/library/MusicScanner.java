@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.util.Log;
 
 /**
  * Created by bkoruznjak on 02/05/2017.
@@ -15,15 +14,21 @@ public class MusicScanner {
 
     private boolean goodToGo;
     private Context mContext;
+    private MediaListener mMediaListener;
 
     /**
      * Prepares the MusicScanner for music retrieval. We need the context for the Content Resolver.
+     *
+     * Sets the media listener for new songs.
+     *
      * prepare() should be called in onStart()
      * @param context
+     * @param mediaListener
      */
-    public void prepare(Context context) {
+    public void prepare(Context context, MediaListener mediaListener) {
         goodToGo = true;
         this.mContext = context;
+        this.mMediaListener = mediaListener;
     }
 
     /**
@@ -32,10 +37,12 @@ public class MusicScanner {
     public void clean() {
         goodToGo = false;
         this.mContext = null;
+        this.mMediaListener = null;
     }
 
     /**
-     * Collects music info from the Content Resolver and returns with a notification when finished.
+     * Collects music info from the Content Resolver and returns and notifies the media listener
+     * when finished.
      *
      * Throws Illegal Argument Exception when called prior to a prepare().
      */
@@ -57,8 +64,7 @@ public class MusicScanner {
                     while (cur.moveToNext()) {
                         String data = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.DATA));
                         // Add code to get more column here
-                        Log.d("bbb", "data..:" + data);
-                        // Save to your list here
+                        mMediaListener.onMediaFound(data);
                     }
                 }
             }
@@ -67,5 +73,13 @@ public class MusicScanner {
         } else {
             throw new IllegalArgumentException("read called before prepare");
         }
+    }
+
+    /**
+     * Implement this to get data from the music scanner back to you.
+     */
+    public interface MediaListener{
+
+        void onMediaFound(String data);
     }
 }
