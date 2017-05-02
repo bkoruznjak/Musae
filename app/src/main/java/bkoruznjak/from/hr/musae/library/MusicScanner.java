@@ -10,6 +10,9 @@ import android.provider.MediaStore;
  * Created by bkoruznjak on 02/05/2017.
  */
 
+/**
+ * Scanner related to finding new media items on your device.
+ */
 public class MusicScanner {
 
     private boolean goodToGo;
