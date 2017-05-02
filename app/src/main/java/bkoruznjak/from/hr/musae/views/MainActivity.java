@@ -114,7 +114,6 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
 
     @Override
     public void onMediaFound(String data) {
-        Log.d("bbb", data);
         String songData = data.substring(data.lastIndexOf("/") + 1);
         String[] songDataArray = songData.split(" - ");
         if (songDataArray.length == 2) {
@@ -122,10 +121,10 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
             String title = songDataArray[1];
 
             mSongList.add(new SongModel(author, title, data));
-            mSongAdapter.notifyDataSetChanged();
         } else {
-            Log.d("bbb", "parse screwed uo:" + songData);
+            mSongList.add(new SongModel("", songData, data));
         }
+        mSongAdapter.notifyDataSetChanged();
 
     }
 }
