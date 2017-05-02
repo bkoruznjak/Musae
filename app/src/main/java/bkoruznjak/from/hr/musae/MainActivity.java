@@ -1,15 +1,11 @@
 package bkoruznjak.from.hr.musae;
 
 import android.Manifest;
-import android.content.ContentResolver;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -21,27 +17,27 @@ import android.widget.Toast;
 import java.io.IOException;
 
 import bkoruznjak.from.hr.musae.databinding.ActivityMainBinding;
-import bkoruznjak.from.hr.musae.library.FileScanner;
+import bkoruznjak.from.hr.musae.library.MusicScanner;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding mainBinding;
     private final int READ_EXTERNAL_STORAGE_PERMISSION_ID = 69;
+    private MusicScanner musicScanner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        final FileScanner scanner = new FileScanner();
-
+        musicScanner = new MusicScanner();
 
         mainBinding.btnScanFolders.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 if (hasRightsToDoMagic()) {
-                    readTheMusic();
+                    musicScanner.gatherMusicInfo();
                 }
 
 
@@ -66,32 +62,16 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void readTheMusic() {
-        ContentResolver cr = getContentResolver();
+    @Override
+    protected void onStart() {
+        super.onStart();
+        musicScanner.prepare(this);
+    }
 
-        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        String selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
-        String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
-
-
-        Cursor cur = cr.query(uri, null, selection, null, sortOrder);
-        int count = 0;
-
-        if (cur != null) {
-            count = cur.getCount();
-
-            if (count > 0) {
-                while (cur.moveToNext()) {
-                    String data = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.DATA));
-                    // Add code to get more column here
-                    Log.d("bbb", "data..:" + data);
-                    // Save to your list here
-                }
-
-            }
-        }
-
-        cur.close();
+    @Override
+    protected void onStop() {
+        super.onStop();
+        musicScanner.clean();
     }
 
     @Override
@@ -101,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case READ_EXTERNAL_STORAGE_PERMISSION_ID:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    readTheMusic();
+                    musicScanner.gatherMusicInfo();
                 } else {
                     Toast.makeText(getApplicationContext(), "Aplikacija nema potrebne ovlasti za dijeljenje raspoloženja", Toast.LENGTH_SHORT).show();
                 }
