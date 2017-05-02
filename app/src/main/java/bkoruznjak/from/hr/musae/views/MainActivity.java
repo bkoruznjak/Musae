@@ -10,21 +10,30 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import bkoruznjak.from.hr.musae.R;
 import bkoruznjak.from.hr.musae.databinding.ActivityMainBinding;
 import bkoruznjak.from.hr.musae.library.MusicScanner;
+import bkoruznjak.from.hr.musae.views.songs.SongAdapter;
+import bkoruznjak.from.hr.musae.views.songs.SongModel;
 
-public class MainActivity extends AppCompatActivity implements MusicScanner.MediaListener{
+public class MainActivity extends AppCompatActivity implements MusicScanner.MediaListener {
 
     private ActivityMainBinding mainBinding;
     private final int READ_EXTERNAL_STORAGE_PERMISSION_ID = 69;
     private MusicScanner musicScanner;
+    private List<SongModel> mSongList = new ArrayList<>(4);
+    private SongAdapter mSongAdapter;
+    private RecyclerView.LayoutManager layoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +41,11 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
         mainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         musicScanner = new MusicScanner();
+        mSongAdapter = new SongAdapter(mSongList);
+
+        layoutManager = new LinearLayoutManager(this);
+        mainBinding.recyclerViewSongs.setLayoutManager(layoutManager);
+        mainBinding.recyclerViewSongs.setAdapter(mSongAdapter);
 
         mainBinding.btnScanFolders.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
     @Override
     protected void onStart() {
         super.onStart();
-        musicScanner.prepare(this,this);
+        musicScanner.prepare(this, this);
     }
 
     @Override
@@ -104,6 +118,18 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
 
     @Override
     public void onMediaFound(String data) {
-        Log.d("bbb",data);
+        Log.d("bbb", data);
+        String songData = data.substring(data.lastIndexOf("/") + 1);
+        String[] songDataArray = songData.split(" - ");
+        if (songDataArray.length == 2) {
+            String author = songDataArray[0];
+            String title = songDataArray[1];
+
+            mSongList.add(new SongModel(author, title, data));
+            mSongAdapter.notifyDataSetChanged();
+        } else {
+            Log.d("bbb", "parse screwed uo:" + songData);
+        }
+
     }
 }

@@ -20,5 +20,12 @@
             android:layout_below="@+id/btn_scan_folders"
             android:text="run radio" />
 
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view_songs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@+id/btn_start_player" />
+
     </RelativeLayout>
 </layout>
