@@ -7,15 +7,14 @@
         android:layout_height="match_parent"
         tools:context="bkoruznjak.from.hr.musae.views.MainActivity">
 
-        <RelativeLayout
-            android:id="@+id/placeholder"
-            android:background="@color/colorAccent"
+        <bkoruznjak.from.hr.musae.views.VisualizerView
+            android:id="@+id/visualizer_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_above="@+id/control_layout">
 
-        </RelativeLayout>
+        </bkoruznjak.from.hr.musae.views.VisualizerView>
 
         <LinearLayout
             android:id="@+id/control_layout"

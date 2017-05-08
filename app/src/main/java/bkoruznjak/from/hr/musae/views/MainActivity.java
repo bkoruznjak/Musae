@@ -186,12 +186,7 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
                 new Visualizer.OnDataCaptureListener() {
                     public void onWaveFormDataCapture(Visualizer visualizer,
                                                       byte[] bytes, int samplingRate) {
-                        String line = "";
-                        for (int i = 0; i < bytes.length; i++) {
-                            line = line + bytes[i] + " ";
-                        }
-                        Log.d("bbb", line);
-//                        mVisualizerView.updateVisualizer(bytes);
+                        mainBinding.visualizerView.updateVisualizer(bytes);
                     }
 
                     public void onFftDataCapture(Visualizer visualizer,
