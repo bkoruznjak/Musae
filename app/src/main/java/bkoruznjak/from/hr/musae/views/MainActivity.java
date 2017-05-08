@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
     private RecyclerView.LayoutManager layoutManager;
     private MediaPlayer mediaPlayer;
     private Visualizer mVisualizer;
-    //equalizer stuff
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -192,6 +191,6 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
                     public void onFftDataCapture(Visualizer visualizer,
                                                  byte[] bytes, int samplingRate) {
                     }
-                }, Visualizer.getMaxCaptureRate() / 2, true, false);
+                }, Visualizer.getMaxCaptureRate(), true, false);
     }
 }
