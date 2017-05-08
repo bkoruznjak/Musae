@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
     private List<SongModel> mSongList = new ArrayList<>(4);
     private SongAdapter mSongAdapter;
     private RecyclerView.LayoutManager layoutManager;
+    private MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,17 +48,31 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
         mainBinding.recyclerViewSongs.setLayoutManager(layoutManager);
         mainBinding.recyclerViewSongs.setAdapter(mSongAdapter);
 
+        //very bad and temp sollution
         mainBinding.btnStartPlayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
-                    MediaPlayer mediaPlayer = new MediaPlayer();
-                    mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                    mediaPlayer.setDataSource("/storage/emulated/0/Music/The weekend - sidewalks.mp3");
+                    if (mediaPlayer == null) {
+                        mediaPlayer = new MediaPlayer();
+                        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                        mediaPlayer.setDataSource("/storage/emulated/0/Music/The weekend - sidewalks.mp3");
+                    }
                     mediaPlayer.prepare();
                     mediaPlayer.start();
                 } catch (IOException ioEx) {
                     Log.e("bbb", "ioEx:" + ioEx);
+                }
+            }
+        });
+
+        mainBinding.btnStopPlayer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mediaPlayer != null) {
+                    mediaPlayer.pause();
+                    mediaPlayer.seekTo(0);
+                    mediaPlayer.stop();
                 }
             }
         });

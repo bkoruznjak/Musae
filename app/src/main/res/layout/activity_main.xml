@@ -7,18 +7,46 @@
         android:layout_height="match_parent"
         tools:context="bkoruznjak.from.hr.musae.views.MainActivity">
 
-        <Button
-            android:id="@+id/btn_start_player"
+        <RelativeLayout
+            android:id="@+id/placeholder"
+            android:background="@color/colorAccent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="run radio" />
+            android:layout_alignParentTop="true"
+            android:layout_above="@+id/control_layout">
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/control_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_centerInParent="true"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/btn_start_player"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="play song"
+                android:layout_weight="1"/>
+
+            <Button
+                android:id="@+id/btn_stop_player"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="stop song"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view_songs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_below="@+id/btn_start_player" />
+            android:layout_below="@+id/control_layout" />
 
     </RelativeLayout>
 </layout>
