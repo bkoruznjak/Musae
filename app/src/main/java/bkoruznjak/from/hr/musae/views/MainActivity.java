@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.audiofx.Visualizer;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -30,11 +31,14 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
 
     private ActivityMainBinding mainBinding;
     private final int READ_EXTERNAL_STORAGE_PERMISSION_ID = 69;
+    private final int RECORD_AUDIO_SETTINGS_PERMISSION_ID = 96;
     private MusicScanner musicScanner;
     private List<SongModel> mSongList = new ArrayList<>(4);
     private SongAdapter mSongAdapter;
     private RecyclerView.LayoutManager layoutManager;
     private MediaPlayer mediaPlayer;
+    private Visualizer mVisualizer;
+    //equalizer stuff
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
         mainBinding.recyclerViewSongs.setLayoutManager(layoutManager);
         mainBinding.recyclerViewSongs.setAdapter(mSongAdapter);
 
-        //very bad and temp sollution
+        //very bad and temp solution
         mainBinding.btnStartPlayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -57,9 +61,11 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
                         mediaPlayer = new MediaPlayer();
                         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                         mediaPlayer.setDataSource("/storage/emulated/0/Music/The weekend - sidewalks.mp3");
+                        setupVisualizerFxAndUI();
                     }
                     mediaPlayer.prepare();
                     mediaPlayer.start();
+                    mVisualizer.setEnabled(true);
                 } catch (IOException ioEx) {
                     Log.e("bbb", "ioEx:" + ioEx);
                 }
@@ -73,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
                     mediaPlayer.pause();
                     mediaPlayer.seekTo(0);
                     mediaPlayer.stop();
+                    mVisualizer.setEnabled(false);
                 }
             }
         });
@@ -87,8 +94,14 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
     @Override
     protected void onResume() {
         super.onResume();
-        if (hasRightsToDoMagic()) {
+        if (hasReadStorageRights()) {
             musicScanner.gatherMusicInfo();
+        }
+
+        if (hasModAudioRights()) {
+            Log.d("bbb", "imam rightse");
+        } else {
+            Log.d("bbb", "nemam rightse");
         }
     }
 
@@ -110,13 +123,33 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
                     Toast.makeText(getApplicationContext(), "App does not have sufficient permissions to check your media", Toast.LENGTH_SHORT).show();
                 }
                 break;
+            case RECORD_AUDIO_SETTINGS_PERMISSION_ID:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d("bbb", "we have rights gg wp");
+                } else {
+                    Toast.makeText(getApplicationContext(), "App does not have sufficient permissions to visualize audio", Toast.LENGTH_SHORT).show();
+                }
+                break;
         }
     }
 
-    private boolean hasRightsToDoMagic() {
-        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+    private boolean hasModAudioRights() {
+        int permissionCheckModifySound = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
 
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+        if (permissionCheckModifySound != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                    this, new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO_SETTINGS_PERMISSION_ID);
+
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private boolean hasReadStorageRights() {
+        int permissionCheckExternalStorage = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        if (permissionCheckExternalStorage != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
                     this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE_PERMISSION_ID);
 
@@ -141,5 +174,29 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
         }
         mSongAdapter.notifyDataSetChanged();
 
+    }
+
+    private void setupVisualizerFxAndUI() {
+
+        // Create the Visualizer object and attach it to our media player.
+        int audioSessionId = mediaPlayer.getAudioSessionId();
+        mVisualizer = new Visualizer(audioSessionId);
+        mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
+        mVisualizer.setDataCaptureListener(
+                new Visualizer.OnDataCaptureListener() {
+                    public void onWaveFormDataCapture(Visualizer visualizer,
+                                                      byte[] bytes, int samplingRate) {
+                        String line = "";
+                        for (int i = 0; i < bytes.length; i++) {
+                            line = line + bytes[i] + " ";
+                        }
+                        Log.d("bbb", line);
+//                        mVisualizerView.updateVisualizer(bytes);
+                    }
+
+                    public void onFftDataCapture(Visualizer visualizer,
+                                                 byte[] bytes, int samplingRate) {
+                    }
+                }, Visualizer.getMaxCaptureRate() / 2, true, false);
     }
 }
