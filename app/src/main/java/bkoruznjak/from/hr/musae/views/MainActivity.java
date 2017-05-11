@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
                     if (mediaPlayer == null) {
                         mediaPlayer = new MediaPlayer();
                         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                        mediaPlayer.setDataSource("/storage/emulated/0/Music/The weekend - sidewalks.mp3");
+                        mediaPlayer.setDataSource("/storage/emulated/0/Music/Sol - 2020.mp3");
                         setupVisualizerFxAndUI();
                     }
                     mediaPlayer.prepare();
