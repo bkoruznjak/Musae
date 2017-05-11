@@ -190,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
 
                     public void onFftDataCapture(Visualizer visualizer,
                                                  byte[] bytes, int samplingRate) {
+                        mainBinding.visualizerView.updateVisualizer(bytes);
                     }
                 }, Visualizer.getMaxCaptureRate(), true, false);
     }
