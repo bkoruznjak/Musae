@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 /**
@@ -38,7 +37,7 @@ public class VisualizerView extends View {
 
     private void init() {
         mBytes = null;
-        mForePaint.setStrokeWidth(6f);
+        mForePaint.setStrokeWidth(20f);
         mForePaint.setAntiAlias(true);
         mForePaint.setColor(Color.rgb(0, 128, 255));
     }
@@ -72,8 +71,8 @@ public class VisualizerView extends View {
             mPoints[i * 4 + 1] = mRect.height();
             mPoints[i * 4 + 3] = mRect.height() - (dbValue * 2 - 10);
 
+            //todo use this callback to draw the points you need
             float distance = mPoints[i*4 +1] - mPoints[i * 4 + 3];
-            Log.d("bbb", "i:" + i + ",distance " + distance);
         }
         canvas.drawLines(mPoints, mForePaint);
     }
