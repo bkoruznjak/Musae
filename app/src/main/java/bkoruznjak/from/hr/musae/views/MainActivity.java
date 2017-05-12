@@ -167,9 +167,9 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
             String author = songDataArray[0];
             String title = songDataArray[1];
 
-            mSongList.add(new SongModel(author, title, data));
+            mSongList.add(new SongModel(author, title, data, mSongList.size()));
         } else {
-            mSongList.add(new SongModel("", songData, data));
+            mSongList.add(new SongModel("", songData, data, mSongList.size()));
         }
         mSongAdapter.notifyDataSetChanged();
 

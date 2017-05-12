@@ -24,7 +24,7 @@ public class MusicScanner {
      *
      * Sets the media listener for new songs.
      *
-     * prepare() should be called in onStart()
+     * prepareSong() should be called in onStart()
      * @param context
      * @param mediaListener
      */
@@ -47,7 +47,7 @@ public class MusicScanner {
      * Collects music info from the Content Resolver and returns and notifies the media listener
      * when finished.
      *
-     * Throws Illegal Argument Exception when called prior to a prepare().
+     * Throws Illegal Argument Exception when called prior to a prepareSong().
      */
     public void gatherMusicInfo() {
         if (goodToGo) {
@@ -74,7 +74,7 @@ public class MusicScanner {
 
             cur.close();
         } else {
-            throw new IllegalArgumentException("read called before prepare");
+            throw new IllegalArgumentException("read called before prepareSong");
         }
     }
 
