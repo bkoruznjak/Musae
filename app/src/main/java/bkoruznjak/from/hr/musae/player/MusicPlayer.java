@@ -17,14 +17,18 @@ import bkoruznjak.from.hr.musae.views.songs.SongModel;
 public class MusicPlayer implements Controlable, Deejay, Watchable, MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener {
 
     private static MusicPlayer INSTANCE;
+    public final int AUDIO_SESSION_ID;
     private MediaPlayer mediaPlayer;
     private List<SongModel> musicList;
     private SongModel mCurrentSong;
+    private boolean hasSetBeenSet;
+    private boolean hasPlayerEverBeenStarted;
     private boolean mShuffle;
 
     private MusicPlayer() {
         //override the public one
         mediaPlayer = new MediaPlayer();
+        AUDIO_SESSION_ID = mediaPlayer.getAudioSessionId();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
     }
 
@@ -44,10 +48,18 @@ public class MusicPlayer implements Controlable, Deejay, Watchable, MediaPlayer.
     @Override
     public void prepareSet(@NonNull List<SongModel> musicList) {
         this.musicList = musicList;
+
+        if (!hasSetBeenSet) {
+            hasSetBeenSet = true;
+            mCurrentSong = musicList.get(0);
+            prepareSong(mCurrentSong.getSongIndex());
+        }
     }
 
     /**
      * Prepare song to play
+     * <p>
+     * In case of the player already playing music will just switch song and continue playing.
      */
     @Override
     public void prepareSong(int index) {
@@ -59,13 +71,14 @@ public class MusicPlayer implements Controlable, Deejay, Watchable, MediaPlayer.
             throw new IllegalStateException("no music to play");
         }
 
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.stop();
-        }
-
+        stop();
+        mCurrentSong = musicList.get(index);
         try {
-            mediaPlayer.setDataSource(musicList.get(index).getFileUri());
+            mediaPlayer.setDataSource(mCurrentSong.getFileUri());
             mediaPlayer.prepare();
+            if (hasPlayerEverBeenStarted) {
+                mediaPlayer.start();
+            }
         } catch (IOException ioEx) {
             Log.e("musae", "Error loading data source:" + ioEx.toString());
         }
@@ -73,6 +86,7 @@ public class MusicPlayer implements Controlable, Deejay, Watchable, MediaPlayer.
 
     @Override
     public void play() {
+        hasPlayerEverBeenStarted = true;
         mediaPlayer.start();
     }
 
@@ -89,16 +103,26 @@ public class MusicPlayer implements Controlable, Deejay, Watchable, MediaPlayer.
         pause();
         mediaPlayer.seekTo(0);
         mediaPlayer.stop();
+        mediaPlayer.reset();
     }
 
     @Override
     public void next() {
-        prepareSong(mCurrentSong.getSongIndex() + 1);
+        if (mCurrentSong.getSongIndex() + 1 < musicList.size()) {
+            prepareSong(mCurrentSong.getSongIndex() + 1);
+        } else {
+            prepareSong(0);
+        }
+
     }
 
     @Override
     public void previous() {
-        prepareSong(mCurrentSong.getSongIndex() - 1);
+        if (mCurrentSong.getSongIndex() - 1 >= 0) {
+            prepareSong(mCurrentSong.getSongIndex() - 1);
+        } else {
+            prepareSong(musicList.size() - 1);
+        }
     }
 
     @Override
@@ -126,7 +150,7 @@ public class MusicPlayer implements Controlable, Deejay, Watchable, MediaPlayer.
     @Override
     public void onCompletion(MediaPlayer mp) {
         Log.d("bbb", "COMPLETED");
-
+        next();
     }
 
     @Override

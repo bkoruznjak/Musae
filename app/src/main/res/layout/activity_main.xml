@@ -11,8 +11,8 @@
             android:id="@+id/visualizer_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_above="@+id/control_layout">
+            android:layout_above="@+id/control_layout"
+            android:layout_alignParentTop="true">
 
         </bkoruznjak.from.hr.musae.views.VisualizerView>
 
@@ -20,23 +20,44 @@
             android:id="@+id/control_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_centerInParent="true"
-            android:weightSum="2">
+            android:orientation="horizontal"
+            android:weightSum="5">
 
             <Button
-                android:id="@+id/btn_start_player"
+                android:id="@+id/btn_prev"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="play song"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:text="prev" />
 
             <Button
-                android:id="@+id/btn_stop_player"
+                android:id="@+id/btn_play"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="stop song"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:text="play" />
+
+            <Button
+                android:id="@+id/btn_pause"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="pause" />
+
+            <Button
+                android:id="@+id/btn_repeat"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="repeat" />
+
+            <Button
+                android:id="@+id/btn_next"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="next" />
 
         </LinearLayout>
 

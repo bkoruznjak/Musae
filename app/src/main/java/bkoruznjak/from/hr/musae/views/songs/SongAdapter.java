@@ -14,15 +14,16 @@ import bkoruznjak.from.hr.musae.R;
  * Created by bkoruznjak on 02/05/2017.
  */
 
-public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
+public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder> {
 
     private List<SongModel> mSongList;
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    class SongViewHolder extends RecyclerView.ViewHolder {
         public TextView textTitle;
         public TextView textAuthor;
+        protected int index;
 
-        public ViewHolder(View v) {
+        public SongViewHolder(View v) {
             super(v);
             textTitle = (TextView) v.findViewById(R.id.txt_song_title);
             textAuthor = (TextView) v.findViewById(R.id.txt_song_author);
@@ -34,18 +35,19 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     }
 
     @Override
-    public SongAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                     int viewType) {
+    public SongAdapter.SongViewHolder onCreateViewHolder(ViewGroup parent,
+                                                         int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.card_view_song, parent, false);
-        ViewHolder vh = new ViewHolder(v);
+        SongViewHolder vh = new SongViewHolder(v);
         return vh;
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final SongViewHolder holder, int position) {
         holder.textTitle.setText(mSongList.get(position).getTitle());
         holder.textAuthor.setText(mSongList.get(position).getAuthor());
+        holder.index = position;
     }
 
     @Override

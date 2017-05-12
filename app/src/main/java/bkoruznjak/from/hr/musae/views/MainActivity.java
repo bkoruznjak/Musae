@@ -3,8 +3,6 @@ package bkoruznjak.from.hr.musae.views;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.media.audiofx.Visualizer;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,15 +15,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import bkoruznjak.from.hr.musae.R;
 import bkoruznjak.from.hr.musae.databinding.ActivityMainBinding;
 import bkoruznjak.from.hr.musae.library.MusicScanner;
+import bkoruznjak.from.hr.musae.player.MusicPlayer;
 import bkoruznjak.from.hr.musae.views.songs.SongAdapter;
 import bkoruznjak.from.hr.musae.views.songs.SongModel;
+import bkoruznjak.from.hr.musae.views.songs.SongSelectionListener;
 
 public class MainActivity extends AppCompatActivity implements MusicScanner.MediaListener {
 
@@ -36,58 +35,86 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
     private List<SongModel> mSongList = new ArrayList<>(4);
     private SongAdapter mSongAdapter;
     private RecyclerView.LayoutManager layoutManager;
-    private MediaPlayer mediaPlayer;
+    private MusicPlayer musicPlayer;
     private Visualizer mVisualizer;
+    private SongSelectionListener mSongSelectListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        musicPlayer = MusicPlayer.getInstance();
 
         musicScanner = new MusicScanner();
         mSongAdapter = new SongAdapter(mSongList);
+
+        setupVisualizerFxAndUI();
 
         layoutManager = new LinearLayoutManager(this);
         mainBinding.recyclerViewSongs.setLayoutManager(layoutManager);
         mainBinding.recyclerViewSongs.setAdapter(mSongAdapter);
 
         //very bad and temp solution
-        mainBinding.btnStartPlayer.setOnClickListener(new View.OnClickListener() {
+        mainBinding.btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    if (mediaPlayer == null) {
-                        mediaPlayer = new MediaPlayer();
-                        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                        mediaPlayer.setDataSource("/storage/emulated/0/Music/Sol - 2020.mp3");
-                        setupVisualizerFxAndUI();
-                    }
-                    mediaPlayer.prepare();
-                    mediaPlayer.start();
-                    mVisualizer.setEnabled(true);
-                } catch (IOException ioEx) {
-                    Log.e("bbb", "ioEx:" + ioEx);
-                }
+                musicPlayer.play();
+                mVisualizer.setEnabled(true);
             }
         });
 
-        mainBinding.btnStopPlayer.setOnClickListener(new View.OnClickListener() {
+        mainBinding.btnPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mediaPlayer != null) {
-                    mediaPlayer.pause();
-                    mediaPlayer.seekTo(0);
-                    mediaPlayer.stop();
-                    mVisualizer.setEnabled(false);
-                }
+                musicPlayer.pause();
+                mVisualizer.setEnabled(false);
             }
         });
+
+        mainBinding.btnNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                musicPlayer.next();
+            }
+        });
+
+        mainBinding.btnPrev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                musicPlayer.previous();
+            }
+        });
+
+        mainBinding.btnRepeat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("bbb", "repeat set");
+            }
+        });
+
+        mSongSelectListener = new SongSelectionListener(this, mainBinding.recyclerViewSongs, new SongSelectionListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                // do whatever
+                musicPlayer.prepareSong(position);
+            }
+
+            @Override
+            public void onLongItemClick(View view, int position) {
+                // do whatever
+            }
+        });
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         musicScanner.prepare(this, this);
+        musicPlayer.subscribeWatcher();
+
+        mainBinding.recyclerViewSongs.addOnItemTouchListener(mSongSelectListener);
     }
 
     @Override
@@ -102,12 +129,27 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
         } else {
             Log.d("bbb", "nemam rightse");
         }
+
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         musicScanner.clean();
+        musicPlayer.cancelWatcher();
+        mainBinding.recyclerViewSongs.removeOnItemTouchListener(mSongSelectListener);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mSongSelectListener = null;
     }
 
     @Override
@@ -171,6 +213,8 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
         } else {
             mSongList.add(new SongModel("", songData, data, mSongList.size()));
         }
+
+        musicPlayer.prepareSet(mSongList);
         mSongAdapter.notifyDataSetChanged();
 
     }
@@ -178,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
     private void setupVisualizerFxAndUI() {
 
         // Create the Visualizer object and attach it to our media player.
-        int audioSessionId = mediaPlayer.getAudioSessionId();
+        int audioSessionId = musicPlayer.AUDIO_SESSION_ID;
         mVisualizer = new Visualizer(audioSessionId);
         mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
         mVisualizer.setDataCaptureListener(
