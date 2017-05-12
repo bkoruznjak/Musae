@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
 
         setupVisualizerFxAndUI();
 
-        layoutManager = new LinearLayoutManager(this);
+        layoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false);
         mainBinding.recyclerViewSongs.setLayoutManager(layoutManager);
         mainBinding.recyclerViewSongs.setAdapter(mSongAdapter);
 
