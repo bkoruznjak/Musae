@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 /**
@@ -73,6 +74,7 @@ public class VisualizerView extends View {
 
             //todo use this callback to draw the points you need
             float distance = mPoints[i*4 +1] - mPoints[i * 4 + 3];
+            Log.d("bbb","i:"+i + ", dist:"+distance);
         }
         canvas.drawLines(mPoints, mForePaint);
     }
