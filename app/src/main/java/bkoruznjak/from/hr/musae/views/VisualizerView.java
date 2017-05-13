@@ -76,6 +76,10 @@ public class VisualizerView extends View {
             float distance = mPoints[i*4 +1] - mPoints[i * 4 + 3];
             Log.d("bbb","i:"+i + ", dist:"+distance);
         }
+
+
+
+//        canvas.drawCircle(getWidth() /2, getHeight()/2, 50.0f, mForePaint);
         canvas.drawLines(mPoints, mForePaint);
     }
 

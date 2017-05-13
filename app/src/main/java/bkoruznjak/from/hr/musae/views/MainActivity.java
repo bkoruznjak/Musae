@@ -43,6 +43,10 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+    }
+
+    private void init() {
         mainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         musicPlayer = MusicPlayer.getInstance();
 
@@ -51,10 +55,14 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
 
         setupVisualizerFxAndUI();
 
-        layoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false);
+        layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         mainBinding.recyclerViewSongs.setLayoutManager(layoutManager);
         mainBinding.recyclerViewSongs.setAdapter(mSongAdapter);
 
+        setupClickListeners();
+    }
+
+    private void setupClickListeners() {
         //very bad and temp solution
         mainBinding.btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,12 +113,14 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
                 // do whatever
             }
         });
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
+        init();
+
         musicScanner.prepare(this, this);
         musicPlayer.subscribeWatcher();
 
@@ -223,19 +233,28 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
 
         // Create the Visualizer object and attach it to our media player.
         int audioSessionId = musicPlayer.AUDIO_SESSION_ID;
-        mVisualizer = new Visualizer(audioSessionId);
-        mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
-        mVisualizer.setDataCaptureListener(
-                new Visualizer.OnDataCaptureListener() {
-                    public void onWaveFormDataCapture(Visualizer visualizer,
-                                                      byte[] bytes, int samplingRate) {
-                        mainBinding.visualizerView.updateVisualizer(bytes);
-                    }
+            mVisualizer = new Visualizer(audioSessionId);
+            boolean shouldEnable = false;
+            if (mVisualizer.getEnabled()){
+                mVisualizer.setEnabled(false);
+                shouldEnable = true;
+            }
+            mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
+            mVisualizer.setDataCaptureListener(
+                    new Visualizer.OnDataCaptureListener() {
+                        public void onWaveFormDataCapture(Visualizer visualizer,
+                                                          byte[] bytes, int samplingRate) {
+                            mainBinding.visualizerView.updateVisualizer(bytes);
+                        }
 
-                    public void onFftDataCapture(Visualizer visualizer,
-                                                 byte[] bytes, int samplingRate) {
-                        mainBinding.visualizerView.updateVisualizer(bytes);
-                    }
-                }, Visualizer.getMaxCaptureRate(), true, false);
+                        public void onFftDataCapture(Visualizer visualizer,
+                                                     byte[] bytes, int samplingRate) {
+                            mainBinding.visualizerView.updateVisualizer(bytes);
+                        }
+                    }, Visualizer.getMaxCaptureRate(), true, false);
+
+        if (shouldEnable){
+            mVisualizer.setEnabled(true);
+        }
     }
 }
