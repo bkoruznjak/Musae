@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#E282A1</color>
-    <color name="colorPrimaryDark">#BC6C86</color>
+    <color name="colorPrimary">#F8BD9D</color>
+    <color name="colorPrimaryDark">#DEAA8D</color>
     <color name="roseBud">#F6AE9B</color>
     <color name="mandysPink">#F8BD9D</color>
     <color name="romantic">#FBCA9F</color>
     <color name="violetBlue">#A65D9E</color>
     <color name="carissma">#E282A1</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#E282A1</color>
 
 
 </resources>
