@@ -1,14 +1,18 @@
 package bkoruznjak.from.hr.musae.player;
 
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
+
+import java.lang.ref.WeakReference;
 
 import bkoruznjak.from.hr.musae.R;
 import bkoruznjak.from.hr.musae.views.MainActivity;
@@ -17,18 +21,31 @@ import bkoruznjak.from.hr.musae.views.MainActivity;
  * Created by bkoruznjak on 16/05/2017.
  */
 
-public class MusicService extends Service {
+public class MusicService extends Service implements AudioManager.OnAudioFocusChangeListener, PbPhoneStateListener {
     
     private final IBinder PLAYER_SERVICE = new MusicService.MusicPlayerBinder();
     private final int NOTIFICATION_ID = 8888;
 
-    private NotificationManager mNotificationManager;
     private NotificationCompat.Builder mNotificationBuilder;
+    private AudioManager mAudioManager;
+    private TelephonyManager mTelephonyManager;
+    private PhoneStateHandler mPhoneStateHandler;
+    private MusicPlayer musicPlayer;
+    private PlayerStateModel mPlayerState;
+    private int mStreamVolumeHolder = 0;
 
     @Override
     public void onCreate() {
         super.onCreate();
         createNotification();
+
+        musicPlayer = MusicPlayer.getInstance();
+
+        mTelephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        mStreamVolumeHolder = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+
+        requestFocus();
     }
 
     private void createNotification() {
@@ -42,8 +59,7 @@ public class MusicService extends Service {
                         resultIntent,
                         0
                 );
-        mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
         mNotificationBuilder =
                 new NotificationCompat.Builder(this)
                         .setContentTitle(getString(R.string.notification_title))
@@ -67,6 +83,91 @@ public class MusicService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        abandonFocus();
+    }
+
+    private void requestFocus() {
+        if (mAudioManager != null) {
+            mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
+                    AudioManager.AUDIOFOCUS_GAIN);
+        }
+
+        if (mTelephonyManager != null) {
+            mPhoneStateHandler = new PhoneStateHandler(new WeakReference<PbPhoneStateListener>(this));
+            mTelephonyManager.listen(mPhoneStateHandler,
+                    PhoneStateListener.LISTEN_CALL_STATE);
+        }
+    }
+
+    private void abandonFocus() {
+        if (mAudioManager != null) {
+            mAudioManager.abandonAudioFocus(this);
+        }
+
+        if (mTelephonyManager != null) {
+            mPhoneStateHandler = null;
+            mTelephonyManager.listen(mPhoneStateHandler,
+                    PhoneStateListener.LISTEN_CALL_STATE);
+        }
+    }
+
+    @Override
+    public void onAudioFocusChange(int focusChange) {
+        switch (focusChange) {
+            case AudioManager.AUDIOFOCUS_GAIN:
+                if (mAudioManager != null) {
+                    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
+                            mStreamVolumeHolder,
+                            AudioManager.FLAG_PLAY_SOUND);
+                }
+                break;
+
+            case AudioManager.AUDIOFOCUS_LOSS:
+                break;
+
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                break;
+
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+
+                if (mAudioManager != null) {
+                    mStreamVolumeHolder = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
+                            1,
+                            AudioManager.FLAG_PLAY_SOUND);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void phoneStateChanged(int phoneState) {
+        if (mPlayerState != null) {
+            switch (phoneState) {
+                case TelephonyManager.CALL_STATE_IDLE:
+                    if (mPlayerState.wasMusicInterrupted() && musicPlayer != null) {
+                        mPlayerState.setMusicInterrupted(false);
+                        musicPlayer.play();
+                    }
+                    break;
+                case TelephonyManager.CALL_STATE_RINGING:
+                    if (mPlayerState.playWhenReady() && musicPlayer != null) {
+                        mPlayerState.setMusicInterrupted(true);
+                        musicPlayer.pause();
+                    }
+                    break;
+                case TelephonyManager.CALL_STATE_OFFHOOK:
+                    if (mPlayerState.playWhenReady() && musicPlayer != null) {
+                        mPlayerState.setMusicInterrupted(true);
+                        musicPlayer.pause();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     public class MusicPlayerBinder extends Binder {
