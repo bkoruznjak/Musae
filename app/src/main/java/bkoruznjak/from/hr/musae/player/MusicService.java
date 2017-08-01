@@ -34,6 +34,10 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
     private PlayerStateModel mPlayerState;
     private int mStreamVolumeHolder = 0;
 
+    public static Intent newIntent(Context context) {
+        return new Intent(context, MusicService.class);
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -44,6 +48,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         mTelephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mStreamVolumeHolder = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        mPlayerState = new PlayerStateModel();
 
         requestFocus();
     }
@@ -168,6 +173,14 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
                     break;
             }
         }
+    }
+
+    public PlayerStateModel getPlayerState() {
+        return mPlayerState;
+    }
+
+    public void setPlayerState(PlayerStateModel playerState) {
+        this.mPlayerState = mPlayerState;
     }
 
     public class MusicPlayerBinder extends Binder {

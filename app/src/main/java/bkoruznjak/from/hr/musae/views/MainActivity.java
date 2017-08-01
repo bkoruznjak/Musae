@@ -1,10 +1,15 @@
 package bkoruznjak.from.hr.musae.views;
 
 import android.Manifest;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.media.audiofx.Visualizer;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -22,15 +27,18 @@ import bkoruznjak.from.hr.musae.R;
 import bkoruznjak.from.hr.musae.databinding.ActivityMainBinding;
 import bkoruznjak.from.hr.musae.library.MusicScanner;
 import bkoruznjak.from.hr.musae.player.MusicPlayer;
+import bkoruznjak.from.hr.musae.player.MusicService;
+import bkoruznjak.from.hr.musae.player.PlayerStateModel;
 import bkoruznjak.from.hr.musae.views.songs.SongAdapter;
 import bkoruznjak.from.hr.musae.views.songs.SongModel;
 import bkoruznjak.from.hr.musae.views.songs.SongSelectionListener;
 
 public class MainActivity extends AppCompatActivity implements MusicScanner.MediaListener {
 
-    private ActivityMainBinding mainBinding;
     private final int READ_EXTERNAL_STORAGE_PERMISSION_ID = 69;
     private final int RECORD_AUDIO_SETTINGS_PERMISSION_ID = 96;
+    private ActivityMainBinding mainBinding;
+    private PlayerStateModel mPlayerState;
     private MusicScanner musicScanner;
     private List<SongModel> mSongList = new ArrayList<>(4);
     private SongAdapter mSongAdapter;
@@ -38,6 +46,22 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
     private MusicPlayer musicPlayer;
     private Visualizer mVisualizer;
     private SongSelectionListener mSongSelectListener;
+    private Intent serviceIntent;
+    private MusicService mMusicService;
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MusicService.MusicPlayerBinder binder = (MusicService.MusicPlayerBinder) service;
+            mMusicService = binder.getServiceInstance();
+            mPlayerState = mMusicService.getPlayerState();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
+
 
 
     @Override
@@ -58,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
         layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         mainBinding.recyclerViewSongs.setLayoutManager(layoutManager);
         mainBinding.recyclerViewSongs.setAdapter(mSongAdapter);
-
+        serviceIntent = MusicService.newIntent(this);
         setupClickListeners();
     }
 
@@ -125,6 +149,9 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
         musicPlayer.subscribeWatcher();
 
         mainBinding.recyclerViewSongs.addOnItemTouchListener(mSongSelectListener);
+
+        startService(serviceIntent);
+        bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -139,8 +166,6 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
         } else {
             Log.d("bbb", "nemam rightse");
         }
-
-
     }
 
     @Override
