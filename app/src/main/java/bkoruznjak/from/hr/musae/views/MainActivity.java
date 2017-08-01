@@ -250,6 +250,7 @@ public class MainActivity extends AppCompatActivity implements MusicScanner.Medi
         }
 
         musicPlayer.prepareSet(mSongList);
+        //todo trigger media download
         mSongAdapter.notifyDataSetChanged();
 
     }
