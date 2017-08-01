@@ -11,11 +11,15 @@ public class SongModel {
     private String fileUri;
     private int songIndex;
 
-    public SongModel(String author, String title, String fileUri, int songIndex) {
+
+    private String songCoverUrl;
+
+    public SongModel(String author, String title, String fileUri, int songIndex, String songCoverUrl) {
         this.author = author;
         this.title = title;
         this.fileUri = fileUri;
         this.songIndex = songIndex;
+        this.songCoverUrl = songCoverUrl;
     }
 
     public String getAuthor() {
@@ -42,11 +46,19 @@ public class SongModel {
         this.fileUri = fileUri;
     }
 
+    public int getSongIndex() {
+        return this.songIndex;
+    }
+
     public void setSongIndex(int songIndex) {
         this.songIndex = songIndex;
     }
 
-    public int getSongIndex() {
-        return this.songIndex;
+    public String getSongCoverUrl() {
+        return songCoverUrl;
+    }
+
+    public void setSongCoverUrl(String songCoverUrl) {
+        this.songCoverUrl = songCoverUrl;
     }
 }
