@@ -1,4 +1,4 @@
-package bkoruznjak.from.hr.musae.views;
+package bkoruznjak.from.hr.musae.views.custom;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -41,6 +41,20 @@ public class VisualizerView extends View {
     public VisualizerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
+    }
+
+    public static float getXCoordinateForKnownAngleAndDistance(float knownX, float distance, double angle) {
+        double angleCos = Math.cos(angle);
+        float unknownX = (float) (distance * angleCos);
+        unknownX += knownX;
+        return unknownX;
+    }
+
+    public static float getYCoordinateForKnownAngleAndDistance(float knownY, float distance, double angle) {
+        double angleSin = Math.sin(angle);
+        float unknownY = (float) (distance * angleSin);
+        unknownY += knownY;
+        return unknownY;
     }
 
     private void init() {
@@ -129,20 +143,6 @@ public class VisualizerView extends View {
         }
 
         canvas.drawCircle(mCenterX, mCenterY, centerRadius, mEvenPaint);
-    }
-
-    public static float getXCoordinateForKnownAngleAndDistance(float knownX, float distance, double angle) {
-        double angleCos = Math.cos(angle);
-        float unknownX = (float) (distance * angleCos);
-        unknownX += knownX;
-        return unknownX;
-    }
-
-    public static float getYCoordinateForKnownAngleAndDistance(float knownY, float distance, double angle) {
-        double angleSin = Math.sin(angle);
-        float unknownY = (float) (distance * angleSin);
-        unknownY += knownY;
-        return unknownY;
     }
 
 }

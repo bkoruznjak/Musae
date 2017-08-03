@@ -1,4 +1,4 @@
-package bkoruznjak.from.hr.musae.player;
+package bkoruznjak.from.hr.musae.controller.player;
 
 import android.annotation.TargetApi;
 import android.os.Build;

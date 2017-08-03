@@ -1,4 +1,4 @@
-package bkoruznjak.from.hr.musae.player;
+package bkoruznjak.from.hr.musae.controller.player;
 
 /**
  * Created by bkoruznjak on 12/05/2017.
@@ -7,5 +7,5 @@ package bkoruznjak.from.hr.musae.player;
 public enum RepeatEnum {
     REPEAT,
     NO_REPEAT,
-    REPEAT_ONCE;
+    REPEAT_ONCE
 }

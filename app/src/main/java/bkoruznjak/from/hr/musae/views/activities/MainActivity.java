@@ -1,4 +1,4 @@
-package bkoruznjak.from.hr.musae.views;
+package bkoruznjak.from.hr.musae.views.activities;
 
 import android.Manifest;
 import android.content.ComponentName;
@@ -24,11 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bkoruznjak.from.hr.musae.R;
+import bkoruznjak.from.hr.musae.controller.library.MusicScanner;
+import bkoruznjak.from.hr.musae.controller.player.MusicPlayer;
+import bkoruznjak.from.hr.musae.controller.player.MusicService;
+import bkoruznjak.from.hr.musae.controller.player.PlayerStateModel;
 import bkoruznjak.from.hr.musae.databinding.ActivityMainBinding;
-import bkoruznjak.from.hr.musae.library.MusicScanner;
-import bkoruznjak.from.hr.musae.player.MusicPlayer;
-import bkoruznjak.from.hr.musae.player.MusicService;
-import bkoruznjak.from.hr.musae.player.PlayerStateModel;
 import bkoruznjak.from.hr.musae.views.songs.SongAdapter;
 import bkoruznjak.from.hr.musae.views.songs.SongModel;
 import bkoruznjak.from.hr.musae.views.songs.SongSelectionListener;

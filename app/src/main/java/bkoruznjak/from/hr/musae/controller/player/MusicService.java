@@ -1,4 +1,4 @@
-package bkoruznjak.from.hr.musae.player;
+package bkoruznjak.from.hr.musae.controller.player;
 
 import android.app.PendingIntent;
 import android.app.Service;
@@ -15,7 +15,7 @@ import android.telephony.TelephonyManager;
 import java.lang.ref.WeakReference;
 
 import bkoruznjak.from.hr.musae.R;
-import bkoruznjak.from.hr.musae.views.MainActivity;
+import bkoruznjak.from.hr.musae.views.activities.MainActivity;
 
 /**
  * Created by bkoruznjak on 16/05/2017.

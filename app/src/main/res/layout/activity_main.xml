@@ -5,7 +5,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="bkoruznjak.from.hr.musae.views.MainActivity">
+        tools:context="bkoruznjak.from.hr.musae.views.activities.MainActivity">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view_songs"
@@ -63,13 +63,13 @@
 
         </LinearLayout>
 
-        <bkoruznjak.from.hr.musae.views.VisualizerView
+        <bkoruznjak.from.hr.musae.views.custom.VisualizerView
             android:id="@+id/visualizer_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/control_layout"
             android:layout_alignParentTop="true">
 
-        </bkoruznjak.from.hr.musae.views.VisualizerView>
+        </bkoruznjak.from.hr.musae.views.custom.VisualizerView>
     </RelativeLayout>
 </layout>

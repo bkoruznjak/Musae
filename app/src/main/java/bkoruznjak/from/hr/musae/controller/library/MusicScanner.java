@@ -1,4 +1,4 @@
-package bkoruznjak.from.hr.musae.library;
+package bkoruznjak.from.hr.musae.controller.library;
 
 import android.content.ContentResolver;
 import android.content.Context;

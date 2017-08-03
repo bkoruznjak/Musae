@@ -10,10 +10,20 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 
 public class MusaeApplication extends Application {
 
+    private AppComponent mAppComponent;
+
     @Override
     public void onCreate() {
         super.onCreate();
         Fresco.initialize(this);
+
+        mAppComponent = DaggerAppComponent.builder()
+                .appModule(new AppModule(this))
+                .build();
+    }
+
+    public AppComponent getAppComponent() {
+        return this.mAppComponent;
     }
 
 
